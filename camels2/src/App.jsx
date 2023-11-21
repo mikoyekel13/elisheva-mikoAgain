@@ -10,14 +10,14 @@ import Album from "./components/Album";
 import Photos from "./components/Photos";
 import Todos from "./components/Todos";
 import NotFound from "./components/NotFound";
-
+import Login from "./components/Login";
 
 const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* <Route index path="/login" element={<LogIn />} />
-        <Route path="/register" element={<Register />} /> */}
+        <Route index path="/login" element={<Login />} />
+        {/* <Route path="/register" element={<Register />} /> */}
         <Route element={<Layout />}>
           <Route path="/home/:id" element={<Home />}>
             <Route path="info/" element={<Info />} />
