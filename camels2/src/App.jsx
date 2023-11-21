@@ -1,11 +1,13 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Login from "./assets/components/Login";
 
 const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route index path="/login" element={<LogIn />} />
-        <Route path="/register" element={<Register />} />
+        <Route index element={<Navigate to="/login" replace />} />
+        <Route path="/login" element={<Login />} />
+        {/* <Route path="/register" element={<Register />} />
         <Route element={<Layout />}>
           <Route path="/home/:id" element={<Home />}>
             <Route path="info/" element={<Info />} />
@@ -20,7 +22,7 @@ const App = () => {
             <Route path="todos/" element={<Todos />} />
           </Route>
         </Route>
-        <Route path="*" element={<NotFound />} />
+        <Route path="*" element={<NotFound />} /> */}
       </Routes>
     </BrowserRouter>
   );
