@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import useFetch from "../assets/customHooks/useFetch.jsx";
 
 const Register = () => {
@@ -8,8 +9,11 @@ const Register = () => {
   const [phone, setPhone] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordVerify, setPasswordVerify] = useState("");
+  const [error, setError] = useState(false);
   const [currPage, setCurrPage] = useState(1);
   const fetchData = useFetch;
+  const navigate = useNavigate();
 
   let alphabetChars = "abcdefghijklmnopqrstuvwxyz";
   alphabetChars += alphabetChars.toUpperCase() + " ";
@@ -80,10 +84,15 @@ const Register = () => {
       currValue.length <= 15 &&
       !forbidChars.includes(currValue[currValue.length - 1])
     ) {
-      if (currState === "username") {
-        setUsername(currValue);
-      } else if (currState === "password") {
-        setPassword(currValue);
+      switch (currState) {
+        case "username":
+          setUsername(currValue);
+          break;
+        case "password":
+          setPassword(currValue);
+          break;
+        case "passwordVerify":
+          setPasswordVerify(currValue);
       }
     }
   }
@@ -91,9 +100,10 @@ const Register = () => {
   function handleFirstSubmit(e) {
     e.preventDefault();
     if (email.includes("@") && phone.length >= 10) {
+      setError(false);
       setCurrPage(2);
     } else {
-      console.log("error");
+      setError(true);
     }
   }
 
@@ -126,13 +136,20 @@ const Register = () => {
 
   async function handleSecondSubmit(e) {
     e.preventDefault();
-    await fetchData(`http://localhost:3000/users`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(await createUserObj()),
-    });
+    const currUser = await createUserObj();
+    if (password === passwordVerify) {
+      await fetchData(`http://localhost:3000/users`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(currUser),
+      });
+      setError(false);
+      navigate(`/home/${currUser.id}`);
+    } else {
+      setError(true);
+    }
   }
 
   return (
@@ -175,6 +192,7 @@ const Register = () => {
             onChange={handlePhone}
           />
           <button type="submit">Submit!</button>
+          {error && <h4>Error!</h4>}
         </form>
       ) : (
         <form id="registerForm2" onSubmit={handleSecondSubmit}>
@@ -195,7 +213,16 @@ const Register = () => {
             value={password}
             onChange={(e) => handleInput(e, "password")}
           />
+          <label htmlFor="passwordVerify">verify Password: </label>
+          <input
+            id="passwordVerify"
+            name="passwordVerify"
+            type="password"
+            value={passwordVerify}
+            onChange={(e) => handleInput(e, "passwordVerify")}
+          />
           <button type="submit">Submit!</button>
+          {error && <h4>Not same passwords!</h4>}
         </form>
       )}
     </>
