@@ -107,10 +107,8 @@ const Register = () => {
     }
   }
 
-  async function createUserObj() {
-    const data = await fetchData(`http://localhost:3000/users`);
+  function createUserObj() {
     return {
-      id: data.length + 1,
       name: nameOfUser,
       username: username,
       email: email,
@@ -136,9 +134,9 @@ const Register = () => {
 
   async function handleSecondSubmit(e) {
     e.preventDefault();
-    const currUser = await createUserObj();
+    const currUser = createUserObj();
     if (password === passwordVerify) {
-      await fetchData(`http://localhost:3000/users`, {
+      const newUser = await fetchData(`http://localhost:3000/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -146,8 +144,8 @@ const Register = () => {
         body: JSON.stringify(currUser),
       });
       setError(false);
-      localStorage.setItem("currentUser", currUser.id);
-      navigate(`/home/${currUser.id}`);
+      localStorage.setItem("currentUser", newUser.id);
+      navigate(`/home/${newUser.id}`);
     } else {
       setError(true);
     }

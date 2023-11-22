@@ -275,6 +275,29 @@
         "catchPhrase": "phrase",
         "bs": "bs"
       }
+    },
+    {
+      "name": "example",
+      "username": "fytyt",
+      "email": "example@email.com",
+      "address": {
+        "street": "street",
+        "suite": "suite",
+        "city": "jeruz",
+        "zipcode": "01234-567",
+        "geo": {
+          "lat": "000.000",
+          "lng": "000.000"
+        }
+      },
+      "phone": "012-3456789",
+      "website": "abcd1234",
+      "company": {
+        "name": "company name",
+        "catchPhrase": "phrase",
+        "bs": "bs"
+      },
+      "id": 13
     }
   ],
   "posts": [

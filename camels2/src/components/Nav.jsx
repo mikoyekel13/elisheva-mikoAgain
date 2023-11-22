@@ -16,10 +16,8 @@ const Nav = () => {
   useEffect(() => {
     async function getUserName() {
       const currUserId = localStorage.getItem("currentUser");
-      const data = await fetchData(
-        `http://localhost:3000/users?id=${currUserId}`
-      );
-      setNameOfUser(data[0].name);
+      const data = await fetchData(`http://localhost:3000/users/${currUserId}`);
+      setNameOfUser(data.name);
     }
     getUserName();
   }, [fetchData]);
