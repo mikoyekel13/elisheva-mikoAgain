@@ -1,29 +1,41 @@
 import { useState, useEffect } from "react";
+import useFetch from "../assets/customHooks/useFetch";
+import { useParams } from "react-router-dom";
 
 const Posts = () => {
   const [posts, setPosts] = useState([]);
+  const fetchData = useFetch;
+  const { id, postId } = useParams();
+
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchPosts = async () => {
       try {
-        const response = await fetch("http://localhost:3000/posts");
-        const data = await response.json();
+        let data;
+        postId
+          ? (data = await fetchData(`http://localhost:3000/posts?id=${postId}`))
+          : (data = await fetchData(
+              `http://localhost:3000/posts?userId=${id}`
+            ));
         setPosts(data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
 
-    fetchData();
+    fetchPosts();
   }, []);
 
-  const postsDisplay = posts.map((post) => (
-    <div key={post.id}>
-      <h4>userId: {post.userId}</h4>
-      <h4>id: {post.id}</h4>
-      <h4>title: {post.title}</h4>
-      <h4>body: {post.body}</h4>
-    </div>
-  ));
+  const postsDisplay = posts.map((post) => {
+    console.log(posts);
+    return (
+      <div key={post.id}>
+        <h4>userId: {post?.userId}</h4>
+        <h4>id: {post?.id}</h4>
+        <h4>title: {post?.title}</h4>
+        <h4>body: {post?.body}</h4>
+      </div>
+    );
+  });
   return (
     <section>
       <h2>Your Posts</h2>
