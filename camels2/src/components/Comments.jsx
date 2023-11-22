@@ -30,7 +30,6 @@ const Comments = () => {
         <h4>id: {comment?.id}</h4>
         <h4>name: {comment?.name}</h4>
         <h4>postId: {comment?.postId}</h4>
-
       </div>
     );
   });
