@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Layout from "./components/Layout";
 import Home from "./components/Home";
 import Info from "./components/Info";
@@ -11,13 +11,15 @@ import Photos from "./components/Photos";
 import Todos from "./components/Todos";
 import NotFound from "./components/NotFound";
 import Login from "./components/Login";
+import Register from "./components/Register";
 
 const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route index path="/login" element={<Login />} />
-        {/* <Route path="/register" element={<Register />} /> */}
+        <Route index element={<Navigate to="/login"></Navigate>} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route element={<Layout />}>
           <Route path="/home/:id" element={<Home />}>
             <Route path="info/" element={<Info />} />

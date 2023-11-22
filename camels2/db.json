@@ -229,6 +229,29 @@
         "catchPhrase": "Centralized empowering task-force",
         "bs": "target end-to-end models"
       }
+    },
+    {
+      "id": 11,
+      "name": "miko yekel",
+      "username": "miko2003",
+      "email": "mikoyekel@hilma.tech",
+      "address": {
+        "street": "address",
+        "suite": "suite",
+        "city": "Tel Aviv",
+        "zipcode": "01234-567",
+        "geo": {
+          "lat": "000.000",
+          "lng": "000.000"
+        }
+      },
+      "phone": "058-6275920",
+      "website": "abcd1234",
+      "company": {
+        "name": "company name",
+        "catchPhrase": "phrase",
+        "bs": "bs"
+      }
     }
   ],
   "posts": [
