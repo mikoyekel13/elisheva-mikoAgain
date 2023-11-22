@@ -22,7 +22,7 @@ const Nav = () => {
       setNameOfUser(data[0].name);
     }
     getUserName();
-  }, []);
+  }, [fetchData]);
 
   return (
     <nav>

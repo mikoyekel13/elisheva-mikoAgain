@@ -20,14 +20,27 @@ const Todos = () => {
     };
 
     fetchTodos();
-  }, []);
+  }, [fetchData, id]);
+
+  async function updateTodosDb(e, id) {
+    const currValue = e.target.checked;
+    await fetchData(`http://localhost:3000/todos/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ completed: currValue }),
+    });
+  }
 
   const todosDisplay = todos.map((todo) => {
-    console.log("todo: ", todo.completed); //completed not printing
     return (
       <div key={todo.id}>
-        <h4>completed: {JSON.stringify(todo.completed)}</h4>
-        <h4>userId: {todo.userId}</h4>
+        <input
+          type="checkbox"
+          defaultChecked={todo.completed}
+          onChange={(e) => updateTodosDb(e, todo.id)}
+        />
         <h4>id: {todo.id}</h4>
         <h4>title: {todo.title}</h4>
       </div>
