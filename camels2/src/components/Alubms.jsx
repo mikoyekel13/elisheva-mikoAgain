@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import useFetch from "../assets/customHooks/useFetch";
-import { useParams } from "react-router-dom";
+import { useParams, Outlet } from "react-router-dom";
 
 const Albums = () => {
   const [albums, setAlbums] = useState([]);
@@ -12,7 +12,9 @@ const Albums = () => {
       try {
         let data;
         albumId
-          ? (data = await fetchData(`http://localhost:3000/albums?id=${albumId}`))
+          ? (data = await fetchData(
+              `http://localhost:3000/albums?id=${albumId}`
+            ))
           : (data = await fetchData(
               `http://localhost:3000/albums?userId=${id}`
             ));
@@ -36,16 +38,19 @@ const Albums = () => {
     );
   });
   return (
-    <section>
-      <h2>Your albums</h2>
-      <div>
-        {albums.length > 0 ? (
-          <section>{albumsDisplay}</section>
-        ) : (
-          <h2>Loading...</h2>
-        )}
-      </div>
-    </section>
+    <div>
+      <section>
+        <h2>Your albums</h2>
+        <div>
+          {albums.length > 0 ? (
+            <section>{albumsDisplay}</section>
+          ) : (
+            <h2>Loading...</h2>
+          )}
+        </div>
+      </section>
+      <Outlet />
+    </div>
   );
 };
 
