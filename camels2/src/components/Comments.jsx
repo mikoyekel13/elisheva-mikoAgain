@@ -5,16 +5,15 @@ import { useParams } from "react-router-dom";
 const Comments = () => {
   const [comments, setComments] = useState([]);
   const fetchData = useFetch;
-  const { id } = useParams();
+  const { postId } = useParams();
 
   useEffect(() => {
     const fetchComments = async () => {
       try {
         const data = await fetchData(
-          `http://localhost:3000/comments?postId=${id}`
+          `http://localhost:3000/comments?postId=${postId}`
         );
         setComments(data);
-        console.log('data: ', data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -24,7 +23,6 @@ const Comments = () => {
   }, []);
 
   const commentsDisplay = comments.map((comment) => {
-    console.log("comment: ", comment.completed); //completed not printing
     return (
       <div key={comment?.id}>
         <h4>body: {comment?.body}</h4>
