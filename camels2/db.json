@@ -236,7 +236,7 @@
       "username": "miko2003",
       "email": "mikoyekel@hilma.tech",
       "address": {
-        "street": "address",
+        "street": "street",
         "suite": "suite",
         "city": "Tel Aviv",
         "zipcode": "01234-567",

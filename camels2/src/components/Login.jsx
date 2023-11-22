@@ -1,10 +1,13 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import useFetch from "../assets/customHooks/useFetch.jsx";
 
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [incorrect, setIncorrect] = useState(false);
   const fetchData = useFetch;
+  const navigate = useNavigate();
 
   const forbidChars = [
     "!",
@@ -27,11 +30,11 @@ function Login() {
     const data = await fetchData(
       `http://localhost:3000/users?username=${username}`
     );
-    console.log(data[0].website);
-    if (password === data[0].website) {
-      console.log("loged in");
+    if (data.length > 0 && password === data[0].website) {
+      setIncorrect(false);
+      navigate(`/home/${data[0].id}`);
     } else {
-      console.log("incorrect");
+      setIncorrect(true);
     }
   }
 
@@ -46,10 +49,12 @@ function Login() {
       currValue.length <= 15 &&
       !forbidChars.includes(currValue[currValue.length - 1])
     ) {
-      if (currState === "username") {
-        setUsername(currValue);
-      } else if (currState === "password") {
-        setPassword(currValue);
+      switch (currState) {
+        case "username":
+          setUsername(currValue);
+          break;
+        case "password":
+          setPassword(currValue);
       }
     }
   }
@@ -73,7 +78,9 @@ function Login() {
         value={password}
         onChange={(e) => handleInput(e, "password")}
       />
+      <Link to="/register">Register!</Link>
       <button type="submit">Submit!</button>
+      {incorrect && <h4>Incorrect!</h4>}
     </form>
   );
 }
