@@ -5,6 +5,8 @@ import { Outlet, useParams, useNavigate } from "react-router-dom";
 const Posts = () => {
   const [posts, setPosts] = useState([]);
   const [showPost, setShowPost] = useState(false);
+  const [showComments, setShowComments] = useState(false);
+
   // const [hasShownPost, setHasShownPost] = useState(false);
 
   const fetchData = useFetch;
@@ -54,6 +56,22 @@ const Posts = () => {
           <>
             <h4>userId: {post?.userId}</h4>
             <h4>body: {post?.body}</h4>
+            <button
+              onClick={() => {
+                setShowComments(true);
+                navigate(`/home/${id}/posts/${post.id}/comments`);
+              }}
+            >
+              show comments
+            </button>
+            <button
+              onClick={() => {
+                setShowComments(false);
+                navigate(`/home/${id}/posts/${post.id}`);
+              }}
+            >
+              hide comments
+            </button>
           </>
         )}
       </div>
