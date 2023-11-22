@@ -4,9 +4,27 @@ import useFetch from "../assets/customHooks/useFetch.jsx";
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-const fetch = useFetch();
+  const fetchData = useFetch;
+
+  const forbidChars = [
+    "!",
+    "?",
+    "*",
+    "<",
+    ">",
+    "/",
+    "\\",
+    ";",
+    "(",
+    ")",
+    "{",
+    "}",
+    "[",
+    "]",
+  ];
+
   async function checkUserDetails() {
-    const data = await fetch(
+    const data = await fetchData(
       `http://localhost:3000/users?username=${username}`
     );
     console.log(data[0].website);
@@ -24,22 +42,6 @@ const fetch = useFetch();
 
   function handleInput(e, currState) {
     const currValue = e.target.value;
-    const forbidChars = [
-      "!",
-      "?",
-      "*",
-      "<",
-      ">",
-      "/",
-      "\\",
-      ";",
-      "(",
-      ")",
-      "{",
-      "}",
-      "[",
-      "]",
-    ];
     if (
       currValue.length <= 15 &&
       !forbidChars.includes(currValue[currValue.length - 1])
@@ -53,28 +55,26 @@ const fetch = useFetch();
   }
 
   return (
-    <>
-      <form id="loginForm" onSubmit={handleSubmit}>
-        <label htmlFor="username">Username: </label>
-        <input
-          id="username"
-          name="username"
-          type="text"
-          value={username}
-          onChange={(e) => handleInput(e, "username")}
-        />
-        <br />
-        <label htmlFor="password">Password: </label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          value={password}
-          onChange={(e) => handleInput(e, "password")}
-        />
-        <button type="submit">Submit!</button>
-      </form>
-    </>
+    <form id="loginForm" onSubmit={handleSubmit}>
+      <label htmlFor="username">Username: </label>
+      <input
+        id="username"
+        name="username"
+        type="text"
+        value={username}
+        onChange={(e) => handleInput(e, "username")}
+      />
+      <br />
+      <label htmlFor="password">Password: </label>
+      <input
+        id="password"
+        name="password"
+        type="password"
+        value={password}
+        onChange={(e) => handleInput(e, "password")}
+      />
+      <button type="submit">Submit!</button>
+    </form>
   );
 }
 
