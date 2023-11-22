@@ -111,7 +111,7 @@ const Comments = () => {
   return (
     <section>
       <h2>Your comments</h2>
-      <button onClick={addComment}>add post</button>
+      <button onClick={addComment}>add comment</button>
       <div>
         {comments.length > 0 ? (
           <section>{commentsDisplay}</section>

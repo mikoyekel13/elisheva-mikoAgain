@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import useFetch from "../assets/customHooks/useFetch";
-import { useParams, Outlet } from "react-router-dom";
+import { useParams, Outlet, useNavigate } from "react-router-dom";
 
 const Albums = () => {
   const [albums, setAlbums] = useState([]);
   const fetchData = useFetch;
   const { id, albumId } = useParams();
+  const [showAlbum, setShowAlbum] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAlbums = async () => {
@@ -25,7 +27,7 @@ const Albums = () => {
     };
 
     fetchAlbums();
-  }, []);
+  }, [showAlbum]);
 
   async function deleteAlbum(currAlbumId) {
     await fetchData(`http://localhost:3000/albums/${currAlbumId}`, {
@@ -87,6 +89,22 @@ const Albums = () => {
   const albumsDisplay = albums.map((album) => (
     <div key={album.id}>
       <button
+        onClick={() => {
+          setShowAlbum(true);
+          navigate(`/home/${id}/albums/${album.id}`);
+        }}
+      >
+        show album
+      </button>
+      <button
+        onClick={() => {
+          setShowAlbum(false);
+          navigate(`/home/${id}/albums`);
+        }}
+      >
+        back to albums
+      </button>
+      <button
         onClick={async () => {
           await changeAlbum(album.id);
         }}
@@ -100,9 +118,27 @@ const Albums = () => {
       >
         delete album
       </button>
-      <h4>userId: {album?.userId}</h4>
       <h4>id: {album?.id}</h4>
       <h4>title: {album?.title}</h4>
+      {showAlbum && (
+        <>
+          <h4>userId: {album?.userId}</h4>
+          <button
+            onClick={() => {
+              navigate(`/home/${id}/albums/${album.id}/photos`);
+            }}
+          >
+            show photos
+          </button>
+          <button
+            onClick={() => {
+              navigate(`/home/${id}/albums/${album.id}`);
+            }}
+          >
+            hide photos
+          </button>
+        </>
+      )}
     </div>
   ));
   return (
