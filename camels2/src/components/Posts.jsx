@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import useFetch from "../assets/customHooks/useFetch";
-import { useParams } from "react-router-dom";
+import { Outlet, useParams } from "react-router-dom";
 
 const Posts = () => {
   const [posts, setPosts] = useState([]);
@@ -37,6 +37,7 @@ const Posts = () => {
     );
   });
   return (
+    <div>
     <section>
       <h2>Your Posts</h2>
       <div>
@@ -47,6 +48,8 @@ const Posts = () => {
         )}
       </div>
     </section>
+    <Outlet/>
+    </div>
   );
 };
 

@@ -252,6 +252,29 @@
         "catchPhrase": "phrase",
         "bs": "bs"
       }
+    },
+    {
+      "id": 12,
+      "name": "elisheva",
+      "username": "elisheva",
+      "email": "elishevaisaacs@gmail.com",
+      "address": {
+        "street": "street",
+        "suite": "suite",
+        "city": "elkana",
+        "zipcode": "01234-567",
+        "geo": {
+          "lat": "000.000",
+          "lng": "000.000"
+        }
+      },
+      "phone": "0584010038",
+      "website": "isaacs",
+      "company": {
+        "name": "company name",
+        "catchPhrase": "phrase",
+        "bs": "bs"
+      }
     }
   ],
   "posts": [
