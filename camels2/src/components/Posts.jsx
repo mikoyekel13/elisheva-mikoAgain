@@ -5,14 +5,10 @@ import { Outlet, useParams, useNavigate } from "react-router-dom";
 const Posts = () => {
   const [posts, setPosts] = useState([]);
   const [showPost, setShowPost] = useState(false);
-  const [showComments, setShowComments] = useState(false);
 
   const fetchData = useFetch;
   const { id, postId } = useParams();
   const navigate = useNavigate();
-  useEffect(() => {
-    console.log(posts);
-  }, [posts]);
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -36,42 +32,28 @@ const Posts = () => {
       method: "DELETE",
     });
     setPosts((prevPosts) => {
-      let newPosts = [...prevPosts];
-      const postIndex = prevPosts.findIndex(
-        (post) => post.id === currPostId.id
-      );
-      newPosts.splice(postIndex, 1);
-      return newPosts;
+      return prevPosts.filter((post) => post.id !== currPostId);
     });
   }
 
   async function addPost() {
     const newPostObj = getAddPostContent();
-    const responsePost = await fetchData(`http://localhost:3000/posts/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newPostObj),
-    });
-    console.log("responsePost: ", responsePost);
+    const responsePost = await sendRequestToDb(
+      "POST",
+      `http://localhost:3000/posts/`,
+      newPostObj
+    );
 
     setPosts((prevPosts) => [...prevPosts, responsePost]);
   }
 
   async function changePost(postId) {
     const newPostObj = getAddPostContent();
-    const responsePost = await fetchData(
+    const responsePost = await sendRequestToDb(
+      "PUT",
       `http://localhost:3000/posts/${postId}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newPostObj),
-      }
+      newPostObj
     );
-    console.log("responsePost: ", responsePost);
 
     setPosts((prevPosts) => {
       let newPosts = [...prevPosts];
@@ -83,6 +65,16 @@ const Posts = () => {
     });
   }
 
+  async function sendRequestToDb(requestType, url, body) {
+    const response = await fetchData(url, {
+      method: requestType,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+    return response;
+  }
   function getAddPostContent() {
     const postTitle = prompt("please enter your post title");
     const postBody = prompt("please enter your post body");
@@ -113,7 +105,7 @@ const Posts = () => {
               navigate(`/home/${id}/posts`);
             }}
           >
-            hide post
+            back to posts
           </button>
           <button
             onClick={async () => {
@@ -137,7 +129,6 @@ const Posts = () => {
               <h4>body: {post?.body}</h4>
               <button
                 onClick={() => {
-                  setShowComments(true);
                   navigate(`/home/${id}/posts/${post.id}/comments`);
                 }}
               >
@@ -145,7 +136,6 @@ const Posts = () => {
               </button>
               <button
                 onClick={() => {
-                  setShowComments(false);
                   navigate(`/home/${id}/posts/${post.id}`);
                 }}
               >
