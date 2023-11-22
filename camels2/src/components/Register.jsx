@@ -146,6 +146,7 @@ const Register = () => {
         body: JSON.stringify(currUser),
       });
       setError(false);
+      localStorage.setItem("currentUser", currUser.id);
       navigate(`/home/${currUser.id}`);
     } else {
       setError(true);

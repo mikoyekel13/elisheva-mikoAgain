@@ -26,21 +26,23 @@ function Login() {
     "]",
   ];
 
-  async function checkUserDetails() {
+  async function getUserDetails() {
     const data = await fetchData(
       `http://localhost:3000/users?username=${username}`
     );
+    return data;
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    const data = await getUserDetails();
     if (data.length > 0 && password === data[0].website) {
       setIncorrect(false);
+      localStorage.setItem("currentUser", data[0].id);
       navigate(`/home/${data[0].id}`);
     } else {
       setIncorrect(true);
     }
-  }
-
-  function handleSubmit(e) {
-    e.preventDefault();
-    checkUserDetails();
   }
 
   function handleInput(e, currState) {
