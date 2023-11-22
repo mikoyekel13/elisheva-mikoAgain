@@ -4,9 +4,10 @@ import useFetch from "../customHooks/useFetch.jsx";
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const fetch = useFetch();
 
   async function checkUserDetails() {
-    const data = await useFetch(
+    const data = await fetch(
       `http://localhost:3000/users?username=${username}`
     );
     console.log(data[0].website);
