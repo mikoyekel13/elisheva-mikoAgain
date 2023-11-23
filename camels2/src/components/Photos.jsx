@@ -32,6 +32,66 @@ const Photos = () => {
     fetchPhotos();
   }, [albumId, fetchData]);
 
+  async function deletePhoto(currPhotoId) {
+    await fetchData(`http://localhost:3000/photos/${currPhotoId}`, {
+      method: "DELETE",
+    });
+    setPhotos((prevPhotos) => {
+      return prevPhotos.filter((photo) => photo.id !== currPhotoId);
+    });
+  }
+
+  async function addPhoto() {
+    const newPhotoObj = getAddPhotoContent();
+    const responsePhoto = await sendRequestToDb(
+      "POST",
+      `http://localhost:3000/photos/`,
+      newPhotoObj
+    );
+
+    setPhotos((prevPhotos) => [...prevPhotos, responsePhoto]);
+  }
+
+  async function changePhoto(PhotoId) {
+    const newPhotoObj = getAddPhotoContent();
+    const responsePhoto = await sendRequestToDb(
+      "PUT",
+      `http://localhost:3000/photos/${PhotoId}`,
+      newPhotoObj
+    );
+
+    setPhotos((prevPhotos) => {
+      let newPhotos = [...prevPhotos];
+      const photoIndex = prevPhotos.findIndex(
+        (photo) => photo.id === responsePhoto.id
+      );
+      newPhotos[photoIndex] = responsePhoto;
+      return newPhotos;
+    });
+  }
+
+  async function sendRequestToDb(requestType, url, body) {
+    const response = await fetchData(url, {
+      method: requestType,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+    return response;
+  }
+  function getAddPhotoContent() {
+    const photoTitle = prompt("please enter your photo title");
+    const photoURL = prompt("please enter your photo url");
+    const newPhoto = {
+      albumId: albumId,
+      title: photoTitle,
+      url: "",
+      thumbnailUrl: photoURL,
+    };
+    return newPhoto;
+  }
+
   function getPhotos(numOfPhotos) {
     let photosDisplay = [];
     let end = false;
@@ -46,7 +106,23 @@ const Photos = () => {
       i++
     ) {
       photosDisplay.push(
-        <img key={photos[i].id} src={photos[i].thumbnailUrl} />
+        <div>
+          <img key={photos[i].id} src={photos[i].thumbnailUrl} />
+          <button
+            onClick={async () => {
+              await changePhoto(photos[i].id);
+            }}
+          >
+            update photo
+          </button>
+          <button
+            onClick={async () => {
+              await deletePhoto(photos[i].id);
+            }}
+          >
+            delete photo
+          </button>
+        </div>
       );
     }
     if (end) {
@@ -73,6 +149,8 @@ const Photos = () => {
       ) : (
         <div>
           <>
+            <button onClick={addPhoto}>add photo</button>
+            <br/>
             <section>{photosOnPage}</section>
             <button
               onClick={() =>
@@ -85,7 +163,7 @@ const Photos = () => {
         </div>
       )}
     </>
-  )
-}
+  );
+};
 
 export default Photos;
