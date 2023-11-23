@@ -1,14 +1,13 @@
 import { useState, useEffect } from "react";
 import useFetch from "../assets/customHooks/useFetch";
 import { useParams, Outlet, useNavigate } from "react-router-dom";
+import FilterNav from "./FilterNav";
 
-const Albums = ({showAlbum, setShowAlbum}) => {
+const Albums = ({ showAlbum, setShowAlbum }) => {
   const [albums, setAlbums] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
   const [serchParams, setSearchParams] = useState("");
-  const [filterOn, setFilterOn] = useState("");
-  const [filteredValue, setFilteredValue] = useState("");
 
   const fetchData = useFetch;
   const { id, albumId } = useParams();
@@ -96,11 +95,6 @@ const Albums = ({showAlbum, setShowAlbum}) => {
     return newAlbum;
   }
 
-  function openFilterInput(type) {
-    setFilteredValue("");
-    setFilterOn(type);
-  }
-
   const albumsDisplay = albums.map((album) => (
     <div key={album.id}>
       <button
@@ -163,53 +157,7 @@ const Albums = ({showAlbum, setShowAlbum}) => {
       {isLoading ? (
         <h2>Loading...</h2>
       ) : (
-        <nav id="todosFilterNav">
-          <h3>Filter by: </h3>
-          <button
-            type="button"
-            className="todosFilterBtn"
-            onClick={() => openFilterInput("id")}
-          >
-            id
-          </button>
-          <button
-            type="button"
-            className="todosFilterBtn"
-            onClick={() => openFilterInput("title")}
-          >
-            title
-          </button>
-          <button
-            type="button"
-            className="todosFilterBtn"
-            onClick={() => {
-              setSearchParams("");
-              setFilterOn("");
-            }}
-          >
-            reset filter
-          </button>
-
-          {filterOn.length > 0 && (
-            <>
-              <input
-                type="text"
-                value={filteredValue}
-                onChange={(e) => {
-                  setFilteredValue(e.target.value);
-                }}
-              />
-              <button
-                type="button"
-                onClick={() => {
-                  setSearchParams(`&${filterOn}=${filteredValue}`);
-                }}
-              >
-                Filter {filterOn}
-              </button>
-            </>
-          )}
-        </nav>
+        <FilterNav setSearchParams={setSearchParams} />
       )}
       {error ? (
         <h2>Error! not found</h2>

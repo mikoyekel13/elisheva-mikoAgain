@@ -1,14 +1,13 @@
 import { useState, useEffect } from "react";
 import useFetch from "../assets/customHooks/useFetch";
 import { useParams } from "react-router-dom";
+import FilterNav from "./FilterNav";
 
 const Todos = () => {
   const [todos, setTodos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
   const [serchParams, setSearchParams] = useState("");
-  const [filterOn, setFilterOn] = useState("");
-  const [filteredValue, setFilteredValue] = useState("");
   const fetchData = useFetch;
   const { id } = useParams();
   const alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
@@ -160,22 +159,6 @@ const Todos = () => {
     });
   }
 
-  function openFilterInput(type) {
-    setFilteredValue("");
-    setFilterOn(type);
-  }
-
-  function handleSearchParams() {
-    if (filterOn === "completed") {
-      if (filteredValue !== "false" && filteredValue !== "true") {
-        setFilteredValue("");
-        setSearchParams("");
-        return;
-      }
-    }
-    setSearchParams(`&${filterOn}=${filteredValue}`);
-  }
-
   const todosDisplay = todos.map((todo) => (
     <div key={todo.id}>
       <button
@@ -213,55 +196,7 @@ const Todos = () => {
           <h2>Loading...</h2>
         ) : (
           <>
-            <nav id="todosFilterNav">
-              <h3>Filter by: </h3>
-              <button
-                type="button"
-                className="todosFilterBtn"
-                onClick={() => openFilterInput("id")}
-              >
-                id
-              </button>
-              <button
-                type="button"
-                className="todosFilterBtn"
-                onClick={() => openFilterInput("completed")}
-              >
-                completed
-              </button>
-              <button
-                type="button"
-                className="todosFilterBtn"
-                onClick={() => openFilterInput("title")}
-              >
-                title
-              </button>
-              <button
-                type="button"
-                className="todosFilterBtn"
-                onClick={() => {
-                  setSearchParams("");
-                  setFilterOn("");
-                }}
-              >
-                reset filter
-              </button>
-
-              {filterOn.length > 0 && (
-                <>
-                  <input
-                    type="text"
-                    value={filteredValue}
-                    onChange={(e) => {
-                      setFilteredValue(e.target.value);
-                    }}
-                  />
-                  <button type="button" onClick={handleSearchParams}>
-                    Filter {filterOn}
-                  </button>
-                </>
-              )}
-            </nav>
+            <FilterNav setSearchParams={setSearchParams} todos={true} />
             <nav id="todosSortNav">
               <h3>Sort by: </h3>
               <button type="button" className="todosSortBtn" onClick={sortById}>
@@ -291,10 +226,12 @@ const Todos = () => {
             </nav>
             {error ? (
               <h2>Error! not found</h2>
-            ) : ( <>
-              <h3>Todos: </h3>
-              <section>{todosDisplay}</section>
-            </>)}
+            ) : (
+              <>
+                <h3>Todos: </h3>
+                <section>{todosDisplay}</section>
+              </>
+            )}
           </>
         )}
       </div>

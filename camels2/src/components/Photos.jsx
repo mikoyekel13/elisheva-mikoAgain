@@ -80,6 +80,7 @@ const Photos = () => {
     });
     return response;
   }
+
   function getAddPhotoContent() {
     const photoTitle = prompt("please enter your photo title");
     const photoURL = prompt("please enter your photo url");
@@ -150,7 +151,7 @@ const Photos = () => {
         <div>
           <>
             <button onClick={addPhoto}>add photo</button>
-            <br/>
+            <br />
             <section>{photosOnPage}</section>
             <button
               onClick={() =>
