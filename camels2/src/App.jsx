@@ -45,7 +45,12 @@ const App = () => {
                 <Albums showAlbum={showAlbum} setShowAlbum={setShowAlbum} />
               }
             />
-            <Route path="albums/:albumId" element={<Albums />}>
+            <Route
+              path="albums/:albumId"
+              element={
+                <Albums showAlbum={showAlbum} setShowAlbum={setShowAlbum} />
+              }
+            >
               <Route path="photos" element={<Photos />} />
             </Route>
             <Route path="todos/" element={<Todos />} />
