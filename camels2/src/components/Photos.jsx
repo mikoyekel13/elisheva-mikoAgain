@@ -80,6 +80,7 @@ const Photos = () => {
     });
     return response;
   }
+  
   function getAddPhotoContent() {
     const photoTitle = prompt("please enter your photo title");
     const photoURL = prompt("please enter your photo url");
