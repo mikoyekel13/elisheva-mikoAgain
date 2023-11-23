@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import useFetch from "../assets/customHooks/useFetch";
 import { useParams } from "react-router-dom";
 import FilterNav from "./FilterNav";
+import UpdDelBtns from "./UpdDelBtns";
 
 const Todos = () => {
   const [todos, setTodos] = useState([]);
@@ -31,15 +32,6 @@ const Todos = () => {
     fetchTodos();
   }, [fetchData, id, serchParams]);
 
-  async function deleteToDo(currtodoId) {
-    await fetchData(`http://localhost:3000/todos/${currtodoId}`, {
-      method: "DELETE",
-    });
-    setTodos((prevtodos) => {
-      return prevtodos.filter((todo) => todo.id !== currtodoId);
-    });
-  }
-
   async function addToDo() {
     const newToDoObj = getAddToDoContent();
     const responseToDo = await sendRequestToDb(
@@ -49,24 +41,6 @@ const Todos = () => {
     );
 
     setTodos((prevToDos) => [...prevToDos, responseToDo]);
-  }
-
-  async function changeToDo(todoId) {
-    const newtodoObj = getAddToDoContent();
-    const responseToDo = await sendRequestToDb(
-      "PUT",
-      `http://localhost:3000/todos/${todoId}`,
-      newtodoObj
-    );
-
-    setTodos((prevtodos) => {
-      let newToDos = [...prevtodos];
-      const toDoIndex = prevtodos.findIndex(
-        (todo) => todo.id === responseToDo.id
-      );
-      newToDos[toDoIndex] = responseToDo;
-      return newToDos;
-    });
   }
 
   async function sendRequestToDb(requestType, url, body) {
@@ -161,20 +135,13 @@ const Todos = () => {
 
   const todosDisplay = todos.map((todo) => (
     <div key={todo.id}>
-      <button
-        onClick={async () => {
-          await changeToDo(todo.id);
-        }}
-      >
-        update todo
-      </button>
-      <button
-        onClick={async () => {
-          await deleteToDo(todo.id);
-        }}
-      >
-        delete todo
-      </button>
+      <UpdDelBtns
+        contentId={todo.id}
+        contentUrl={`http://localhost:3000/todos/${todo.id}`}
+        setContent={setTodos}
+        getPostData={getAddToDoContent}
+        sendRequestToDb={sendRequestToDb}
+      />
       <br />
       <input
         type="checkbox"

@@ -76,8 +76,4 @@ const FilterNav = ({ setSearchParams, todos }) => {
   );
 };
 
-FilterNav.defaultProps = {
-  todos: false,
-};
-
 export default FilterNav;

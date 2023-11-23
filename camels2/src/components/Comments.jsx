@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import useFetch from "../assets/customHooks/useFetch";
 import { useParams } from "react-router-dom";
+import UpdDelBtns from "./UpdDelBtns";
 
 const Comments = () => {
   const [comments, setComments] = useState([]);
@@ -29,15 +30,6 @@ const Comments = () => {
     fetchComments();
   }, [fetchData, postId]);
 
-  async function deleteComment(currCommentId) {
-    await fetchData(`http://localhost:3000/comments/${currCommentId}`, {
-      method: "DELETE",
-    });
-    setComments((prevComments) => {
-      return prevComments.filter((comment) => comment.id !== currCommentId);
-    });
-  }
-
   async function addComment() {
     const newCommentsObj = getAddCommentsContent();
     const responseComments = await sendRequestToDb(
@@ -47,24 +39,6 @@ const Comments = () => {
     );
 
     setComments((prevComments) => [...prevComments, responseComments]);
-  }
-
-  async function changeComment(commentsId) {
-    const newCommentsObj = getAddCommentsContent();
-    const responseComments = await sendRequestToDb(
-      "PUT",
-      `http://localhost:3000/comments/${commentsId}`,
-      newCommentsObj
-    );
-
-    setComments((prevComments) => {
-      let newComments = [...prevComments];
-      const commentIndex = prevComments.findIndex(
-        (comment) => comment.id === responseComments.id
-      );
-      newComments[commentIndex] = responseComments;
-      return newComments;
-    });
   }
 
   async function sendRequestToDb(requestType, url, body) {
@@ -93,20 +67,13 @@ const Comments = () => {
   const commentsDisplay = comments.map((comment) => {
     return (
       <div key={comment?.id}>
-        <button
-          onClick={async () => {
-            await changeComment(comment.id);
-          }}
-        >
-          update comment
-        </button>
-        <button
-          onClick={async () => {
-            await deleteComment(comment.id);
-          }}
-        >
-          delete comment
-        </button>
+        <UpdDelBtns
+          contentId={comment.id}
+          contentUrl={`http://localhost:3000/comments/${comment.id}`}
+          setContent={setComments}
+          getPostData={getAddCommentsContent}
+          sendRequestToDb={sendRequestToDb}
+        />
         <h4>body: {comment?.body}</h4>
         <h4>email: {comment?.email}</h4>
         <h4>id: {comment?.id}</h4>
