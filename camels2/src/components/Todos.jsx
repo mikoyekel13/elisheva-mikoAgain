@@ -7,12 +7,8 @@ const Todos = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
   const [serchParams, setSearchParams] = useState("");
-  const [filterId, setFilterId] = useState(false);
-  const [currId, setCurrId] = useState("");
-  const [filterTitle, setFilterTitle] = useState(false);
-  const [currTitle, setCurrTitle] = useState("");
-  const [filterCompleted, setFilterCompleted] = useState(false);
-  const [currCompleted, setCurrCompleted] = useState("");
+  const [filterOn, setFilterOn] = useState("");
+  const [filteredValue, setFilteredValue] = useState("");
   const fetchData = useFetch;
   const { id } = useParams();
   const alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
@@ -20,6 +16,7 @@ const Todos = () => {
   useEffect(() => {
     const fetchTodos = async () => {
       try {
+        setError(false);
         setIsLoading(true);
         const data = await fetchData(
           `http://localhost:3000/todos?userId=${id}${serchParams}`
@@ -32,7 +29,6 @@ const Todos = () => {
         setIsLoading(false);
       }
     };
-
     fetchTodos();
   }, [fetchData, id, serchParams]);
 
@@ -110,6 +106,22 @@ const Todos = () => {
     });
   }
 
+  function openFilterInput(type) {
+    setFilteredValue("");
+    setFilterOn(type);
+  }
+
+  function handleSearchParams() {
+    if (filterOn === "completed") {
+      if (filteredValue !== "false" && filteredValue !== "true") {
+        setFilteredValue("");
+        setSearchParams("");
+        return;
+      }
+    }
+    setSearchParams(`&${filterOn}=${filteredValue}`);
+  }
+
   const todosDisplay = todos.map((todo) => (
     <div key={todo.id}>
       <input
@@ -161,33 +173,21 @@ const Todos = () => {
               <button
                 type="button"
                 className="todosFilterBtn"
-                onClick={() => {
-                  setFilterId(true);
-                  setFilterCompleted(false);
-                  setFilterTitle(false);
-                }}
+                onClick={() => openFilterInput("id")}
               >
                 id
               </button>
               <button
                 type="button"
                 className="todosFilterBtn"
-                onClick={() => {
-                  setFilterCompleted(true);
-                  setFilterId(false);
-                  setFilterTitle(false);
-                }}
+                onClick={() => openFilterInput("completed")}
               >
                 completed
               </button>
               <button
                 type="button"
                 className="todosFilterBtn"
-                onClick={() => {
-                  setFilterTitle(true);
-                  setFilterId(false);
-                  setFilterCompleted(false);
-                }}
+                onClick={() => openFilterInput("title")}
               >
                 title
               </button>
@@ -196,71 +196,23 @@ const Todos = () => {
                 className="todosFilterBtn"
                 onClick={() => {
                   setSearchParams("");
-                  setFilterId(false);
-                  setFilterCompleted(false);
-                  setFilterTitle(false);
+                  setFilterOn("");
                 }}
               >
                 reset filter
               </button>
-              {filterId && (
+
+              {filterOn.length > 0 && (
                 <>
                   <input
                     type="text"
-                    value={currId}
+                    value={filteredValue}
                     onChange={(e) => {
-                      setCurrId(e.target.value);
+                      setFilteredValue(e.target.value);
                     }}
                   />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSearchParams(`&id=${currId}`);
-                    }}
-                  >
-                    Filter
-                  </button>
-                </>
-              )}
-              {filterCompleted && (
-                <>
-                  <input
-                    type="text"
-                    value={currCompleted}
-                    onChange={(e) => {
-                      setCurrCompleted(e.target.value);
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSearchParams(
-                        currCompleted === "false" || currCompleted === "true"
-                          ? `&completed=${currCompleted}`
-                          : ""
-                      );
-                    }}
-                  >
-                    Filter
-                  </button>
-                </>
-              )}
-              {filterTitle && (
-                <>
-                  <input
-                    type="text"
-                    value={currTitle}
-                    onChange={(e) => {
-                      setCurrTitle(e.target.value);
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSearchParams(`&title=${currTitle}`);
-                    }}
-                  >
-                    Filter
+                  <button type="button" onClick={handleSearchParams}>
+                    Filter {filterOn}
                   </button>
                 </>
               )}

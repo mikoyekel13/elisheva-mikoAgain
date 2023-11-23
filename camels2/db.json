@@ -302,6 +302,18 @@
   ],
   "posts": [
     {
+      "title": null,
+      "body": null,
+      "userId": "1",
+      "id": 6
+    },
+    {
+      "title": "yo",
+      "body": "yo",
+      "userId": "1",
+      "id": 7
+    },
+    {
       "userId": 1,
       "id": 8,
       "title": "dolorem dolore est ipsam",
