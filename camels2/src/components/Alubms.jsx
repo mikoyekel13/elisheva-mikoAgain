@@ -2,11 +2,10 @@ import { useState, useEffect } from "react";
 import useFetch from "../assets/customHooks/useFetch";
 import { useParams, Outlet, useNavigate } from "react-router-dom";
 
-const Albums = () => {
+const Albums = ({showAlbum, setShowAlbum}) => {
   const [albums, setAlbums] = useState([]);
   const fetchData = useFetch;
   const { id, albumId } = useParams();
-  const [showAlbum, setShowAlbum] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {

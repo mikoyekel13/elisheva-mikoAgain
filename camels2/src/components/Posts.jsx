@@ -2,9 +2,8 @@ import { useState, useEffect } from "react";
 import useFetch from "../assets/customHooks/useFetch";
 import { Outlet, useParams, useNavigate } from "react-router-dom";
 
-const Posts = () => {
+const Posts = ({showPost, setShowPost}) => {
   const [posts, setPosts] = useState([]);
-  const [showPost, setShowPost] = useState(false);
 
   const fetchData = useFetch;
   const { id, postId } = useParams();

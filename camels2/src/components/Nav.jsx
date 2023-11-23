@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import useFetch from "../assets/customHooks/useFetch.jsx";
 import { useEffect, useState } from "react";
 
-const Nav = () => {
+const Nav = ({ setShowPost, setShowAlbum }) => {
   const navigate = useNavigate();
   const { id } = useParams();
   const fetchData = useFetch;
@@ -42,14 +42,20 @@ const Nav = () => {
       <button
         type="button"
         className="navBtn"
-        onClick={() => navigate(`/home/${id}/posts/`)}
+        onClick={() => {
+          setShowPost(false);
+          navigate(`/home/${id}/posts/`);
+        }}
       >
         Posts
       </button>
       <button
         type="button"
         className="navBtn"
-        onClick={() => navigate(`/home/${id}/albums/`)}
+        onClick={() => {
+          setShowAlbum(false);
+          navigate(`/home/${id}/albums/`);
+        }}
       >
         Albums
       </button>
