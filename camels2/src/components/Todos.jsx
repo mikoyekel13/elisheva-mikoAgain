@@ -213,33 +213,6 @@ const Todos = () => {
           <h2>Loading...</h2>
         ) : (
           <>
-            <nav id="todosSortNav">
-              <h3>Sort by: </h3>
-              <button type="button" className="todosSortBtn" onClick={sortById}>
-                id
-              </button>
-              <button
-                type="button"
-                className="todosSortBtn"
-                onClick={sortByCompleted}
-              >
-                completed
-              </button>
-              <button
-                type="button"
-                className="todosSortBtn"
-                onClick={sortByAlpha}
-              >
-                title
-              </button>
-              <button
-                type="button"
-                className="todosSortBtn"
-                onClick={sortByRandom}
-              >
-                random
-              </button>
-            </nav>
             <nav id="todosFilterNav">
               <h3>Filter by: </h3>
               <button
@@ -289,11 +262,39 @@ const Todos = () => {
                 </>
               )}
             </nav>
+            <nav id="todosSortNav">
+              <h3>Sort by: </h3>
+              <button type="button" className="todosSortBtn" onClick={sortById}>
+                id
+              </button>
+              <button
+                type="button"
+                className="todosSortBtn"
+                onClick={sortByCompleted}
+              >
+                completed
+              </button>
+              <button
+                type="button"
+                className="todosSortBtn"
+                onClick={sortByAlpha}
+              >
+                title
+              </button>
+              <button
+                type="button"
+                className="todosSortBtn"
+                onClick={sortByRandom}
+              >
+                random
+              </button>
+            </nav>
             {error ? (
               <h2>Error! not found</h2>
-            ) : (
+            ) : ( <>
+              <h3>Todos: </h3>
               <section>{todosDisplay}</section>
-            )}
+            </>)}
           </>
         )}
       </div>

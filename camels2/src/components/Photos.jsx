@@ -4,6 +4,8 @@ import { useParams } from "react-router-dom";
 
 const Photos = () => {
   const [photos, setPhotos] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
   const fetchData = useFetch;
   const { albumId } = useParams();
   const [photosOnPage, setPhotosOnPage] = useState([]);
@@ -12,18 +14,23 @@ const Photos = () => {
   useEffect(() => {
     const fetchPhotos = async () => {
       try {
+        setError(false);
+        setIsLoading(true);
         const data = await fetchData(
           `http://localhost:3000/photos?albumId=${albumId}`
         );
+        if (!(data.length > 0)) throw new Error("not found");
         setPhotos(data);
         console.log("data: ", data);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        setError(true);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchPhotos();
-  }, []);
+  }, [albumId, fetchData]);
 
   function getPhotos(numOfPhotos) {
     let photosDisplay = [];
@@ -57,10 +64,14 @@ const Photos = () => {
   }, [photos]);
 
   return (
-    <section>
+    <>
       <h2>Your photos</h2>
-      <div>
-        {photos.length > 0 ? (
+      {isLoading ? (
+        <h2>Loading...</h2>
+      ) : error ? (
+        <h2>Error! not found</h2>
+      ) : (
+        <div>
           <>
             <section>{photosOnPage}</section>
             <button
@@ -71,12 +82,10 @@ const Photos = () => {
               load more
             </button>
           </>
-        ) : (
-          <h2>Loading...</h2>
-        )}
-      </div>
-    </section>
-  );
-};
+        </div>
+      )}
+    </>
+  )
+}
 
 export default Photos;

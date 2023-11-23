@@ -4,6 +4,12 @@ import { useParams, Outlet, useNavigate } from "react-router-dom";
 
 const Albums = ({showAlbum, setShowAlbum}) => {
   const [albums, setAlbums] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [serchParams, setSearchParams] = useState("");
+  const [filterOn, setFilterOn] = useState("");
+  const [filteredValue, setFilteredValue] = useState("");
+
   const fetchData = useFetch;
   const { id, albumId } = useParams();
   const navigate = useNavigate();
@@ -11,22 +17,27 @@ const Albums = ({showAlbum, setShowAlbum}) => {
   useEffect(() => {
     const fetchAlbums = async () => {
       try {
+        setError(false);
+        setIsLoading(true);
         let data;
         albumId
           ? (data = await fetchData(
-              `http://localhost:3000/albums?id=${albumId}`
+              `http://localhost:3000/albums?id=${albumId}${serchParams}`
             ))
           : (data = await fetchData(
-              `http://localhost:3000/albums?userId=${id}`
+              `http://localhost:3000/albums?userId=${id}${serchParams}`
             ));
+        if (!(data.length > 0)) throw new Error("not found");
         setAlbums(data);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        setError(true);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchAlbums();
-  }, [showAlbum]);
+  }, [showAlbum, serchParams, albumId, id, fetchData]);
 
   async function deleteAlbum(currAlbumId) {
     await fetchData(`http://localhost:3000/albums/${currAlbumId}`, {
@@ -85,6 +96,11 @@ const Albums = ({showAlbum, setShowAlbum}) => {
     return newAlbum;
   }
 
+  function openFilterInput(type) {
+    setFilteredValue("");
+    setFilterOn(type);
+  }
+
   const albumsDisplay = albums.map((album) => (
     <div key={album.id}>
       <button
@@ -140,20 +156,75 @@ const Albums = ({showAlbum, setShowAlbum}) => {
       )}
     </div>
   ));
+
   return (
     <div>
-      <section>
-        <h2>Your albums</h2>
-        <button onClick={addAlbum}>add album</button>
-        <div>
-          {albums.length > 0 ? (
-            <section>{albumsDisplay}</section>
-          ) : (
-            <h2>Loading...</h2>
+      <h2>Your albums</h2>
+      {isLoading ? (
+        <h2>Loading...</h2>
+      ) : (
+        <nav id="todosFilterNav">
+          <h3>Filter by: </h3>
+          <button
+            type="button"
+            className="todosFilterBtn"
+            onClick={() => openFilterInput("id")}
+          >
+            id
+          </button>
+          <button
+            type="button"
+            className="todosFilterBtn"
+            onClick={() => openFilterInput("title")}
+          >
+            title
+          </button>
+          <button
+            type="button"
+            className="todosFilterBtn"
+            onClick={() => {
+              setSearchParams("");
+              setFilterOn("");
+            }}
+          >
+            reset filter
+          </button>
+
+          {filterOn.length > 0 && (
+            <>
+              <input
+                type="text"
+                value={filteredValue}
+                onChange={(e) => {
+                  setFilteredValue(e.target.value);
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchParams(`&${filterOn}=${filteredValue}`);
+                }}
+              >
+                Filter {filterOn}
+              </button>
+            </>
           )}
-        </div>
-      </section>
-      <Outlet />
+        </nav>
+      )}
+      {error ? (
+        <h2>Error! not found</h2>
+      ) : (
+        <>
+          <section>
+            <h3>Albums:</h3>
+            <button onClick={addAlbum}>add album</button>
+            <div>
+              <section>{albumsDisplay}</section>
+            </div>
+          </section>
+          <Outlet />
+        </>
+      )}
     </div>
   );
 };
