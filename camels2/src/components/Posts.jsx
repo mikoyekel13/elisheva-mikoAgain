@@ -5,6 +5,11 @@ import { Outlet, useParams, useNavigate } from "react-router-dom";
 const Posts = () => {
   const [posts, setPosts] = useState([]);
   const [showPost, setShowPost] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [serchParams, setSearchParams] = useState("");
+  const [filterOn, setFilterOn] = useState("");
+  const [filteredValue, setFilteredValue] = useState("");
 
   const fetchData = useFetch;
   const { id, postId } = useParams();
@@ -12,20 +17,27 @@ const Posts = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
+        setIsLoading(true);
+        setError(false);
         let data;
         postId
-          ? (data = await fetchData(`http://localhost:3000/posts?id=${postId}`))
+          ? (data = await fetchData(
+              `http://localhost:3000/posts?id=${postId}${serchParams}`
+            ))
           : (data = await fetchData(
-              `http://localhost:3000/posts?userId=${id}`
+              `http://localhost:3000/posts?userId=${id}${serchParams}`
             ));
+        if (!(data.length > 0)) throw new Error("not found");
         setPosts(data);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        setError(true);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchPosts();
-  }, [showPost]);
+  }, [showPost, fetchData, postId, id, serchParams]);
 
   async function deletePost(currPostId) {
     await fetchData(`http://localhost:3000/posts/${currPostId}`, {
@@ -84,6 +96,11 @@ const Posts = () => {
       userId: id,
     };
     return newPost;
+  }
+
+  function openFilterInput(type) {
+    setFilteredValue("");
+    setFilterOn(type);
   }
 
   const postsDisplay =
@@ -148,18 +165,72 @@ const Posts = () => {
     });
   return (
     <div>
-      <section>
-        <h2>Your Posts</h2>
-        <button onClick={addPost}>add post</button>
-        <div>
-          {posts && posts.length > 0 ? (
-            <section>{postsDisplay}</section>
-          ) : (
-            <h2>Loading...</h2>
+      <h2>Your Posts</h2>
+      {isLoading ? (
+        <h2>Loading...</h2>
+      ) : (
+        <nav id="todosFilterNav">
+          <h3>Filter by: </h3>
+          <button
+            type="button"
+            className="todosFilterBtn"
+            onClick={() => openFilterInput("id")}
+          >
+            id
+          </button>
+          <button
+            type="button"
+            className="todosFilterBtn"
+            onClick={() => openFilterInput("title")}
+          >
+            title
+          </button>
+          <button
+            type="button"
+            className="todosFilterBtn"
+            onClick={() => {
+              setSearchParams("");
+              setFilterOn("");
+            }}
+          >
+            reset filter
+          </button>
+
+          {filterOn.length > 0 && (
+            <>
+              <input
+                type="text"
+                value={filteredValue}
+                onChange={(e) => {
+                  setFilteredValue(e.target.value);
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchParams(`&${filterOn}=${filteredValue}`);
+                }}
+              >
+                Filter {filterOn}
+              </button>
+            </>
           )}
-        </div>
-      </section>
-      <Outlet />
+        </nav>
+      )}
+      {error ? (
+        <h2>Error! not found</h2>
+      ) : (
+        <>
+          <h3>Posts:</h3>
+          <section>
+            <button onClick={addPost}>add post</button>
+            <div>
+              <section>{postsDisplay}</section>
+            </div>
+          </section>
+          <Outlet />
+        </>
+      )}
     </div>
   );
 };

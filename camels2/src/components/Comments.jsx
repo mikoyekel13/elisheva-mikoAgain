@@ -4,23 +4,30 @@ import { useParams } from "react-router-dom";
 
 const Comments = () => {
   const [comments, setComments] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
   const fetchData = useFetch;
   const { postId } = useParams();
 
   useEffect(() => {
     const fetchComments = async () => {
       try {
+        setError(false);
+        setIsLoading(true);
         const data = await fetchData(
           `http://localhost:3000/comments?postId=${postId}`
         );
+        if (!(data.length > 0)) throw new Error("not found");
         setComments(data);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        setError(true);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchComments();
-  }, []);
+  }, [fetchData, postId]);
 
   async function deleteComment(currCommentId) {
     await fetchData(`http://localhost:3000/comments/${currCommentId}`, {
@@ -108,18 +115,23 @@ const Comments = () => {
       </div>
     );
   });
+
   return (
-    <section>
+    <>
       <h2>Your comments</h2>
-      <button onClick={addComment}>add comment</button>
-      <div>
-        {comments.length > 0 ? (
-          <section>{commentsDisplay}</section>
-        ) : (
-          <h2>Loading...</h2>
-        )}
-      </div>
-    </section>
+      {isLoading ? (
+        <h2>Loading...</h2>
+      ) : error ? (
+        <h2>Error! not found</h2>
+      ) : (
+        <section>
+          <button onClick={addComment}>add comment</button>
+          <div>
+            <section>{commentsDisplay}</section>
+          </div>
+        </section>
+      )}
+    </>
   );
 };
 

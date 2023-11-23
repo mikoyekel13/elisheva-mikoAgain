@@ -4,24 +4,31 @@ import { useParams } from "react-router-dom";
 
 const Photos = () => {
   const [photos, setPhotos] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
   const fetchData = useFetch;
   const { albumId } = useParams();
 
   useEffect(() => {
     const fetchPhotos = async () => {
       try {
+        setError(false);
+        setIsLoading(true);
         const data = await fetchData(
           `http://localhost:3000/photos?albumId=${albumId}`
         );
+        if (!(data.length > 0)) throw new Error("not found");
         setPhotos(data);
-        console.log('data: ', data)
+        console.log("data: ", data);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        setError(true);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchPhotos();
-  }, []);
+  }, [albumId, fetchData]);
 
   const photosDisplay = photos.map((photo) => {
     return (
@@ -31,23 +38,26 @@ const Photos = () => {
         <h4>id: {photo?.id}</h4>
         <h4>url: {photo?.url}</h4>
         <h4>thumbnailUrl: {photo?.thumbnailUrl}</h4>
-
       </div>
     );
   });
+
   return (
-    <section>
+    <>
       <h2>Your photos</h2>
-      <div>
-        {photos.length > 0 ? (
-          <section>{photosDisplay}</section>
-        ) : (
-          <h2>Loading...</h2>
-        )}
-      </div>
-    </section>
+      {isLoading ? (
+        <h2>Loading...</h2>
+      ) : error ? (
+        <h2>Error! not found</h2>
+      ) : (
+        <section>
+          <div>
+            <section>{photosDisplay}</section>
+          </div>
+        </section>
+      )}
+    </>
   );
 };
 
 export default Photos;
-
