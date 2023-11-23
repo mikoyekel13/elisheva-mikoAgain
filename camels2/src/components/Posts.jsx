@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import useFetch from "../assets/customHooks/useFetch";
 import { Outlet, useParams, useNavigate } from "react-router-dom";
+import FilterNav from "./FilterNav";
+import UpdDelBtns from "./UpdDelBtns";
 
 const Posts = ({ showPost, setShowPost }) => {
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
   const [serchParams, setSearchParams] = useState("");
-  const [filterOn, setFilterOn] = useState("");
-  const [filteredValue, setFilteredValue] = useState("");
 
   const fetchData = useFetch;
   const { id, postId } = useParams();
@@ -38,15 +38,6 @@ const Posts = ({ showPost, setShowPost }) => {
     fetchPosts();
   }, [showPost, fetchData, postId, id, serchParams]);
 
-  async function deletePost(currPostId) {
-    await fetchData(`http://localhost:3000/posts/${currPostId}`, {
-      method: "DELETE",
-    });
-    setPosts((prevPosts) => {
-      return prevPosts.filter((post) => post.id !== currPostId);
-    });
-  }
-
   async function addPost() {
     const newPostObj = getAddPostContent();
     const responsePost = await sendRequestToDb(
@@ -56,24 +47,6 @@ const Posts = ({ showPost, setShowPost }) => {
     );
 
     setPosts((prevPosts) => [...prevPosts, responsePost]);
-  }
-
-  async function changePost(postId) {
-    const newPostObj = getAddPostContent();
-    const responsePost = await sendRequestToDb(
-      "PUT",
-      `http://localhost:3000/posts/${postId}`,
-      newPostObj
-    );
-
-    setPosts((prevPosts) => {
-      let newPosts = [...prevPosts];
-      const postIndex = prevPosts.findIndex(
-        (post) => post.id === responsePost.id
-      );
-      newPosts[postIndex] = responsePost;
-      return newPosts;
-    });
   }
 
   async function sendRequestToDb(requestType, url, body) {
@@ -97,11 +70,6 @@ const Posts = ({ showPost, setShowPost }) => {
     return newPost;
   }
 
-  function openFilterInput(type) {
-    setFilteredValue("");
-    setFilterOn(type);
-  }
-
   const postsDisplay =
     posts &&
     posts.map((post) => {
@@ -123,20 +91,13 @@ const Posts = ({ showPost, setShowPost }) => {
           >
             back to posts
           </button>
-          <button
-            onClick={async () => {
-              await changePost(post.id);
-            }}
-          >
-            update post
-          </button>
-          <button
-            onClick={async () => {
-              await deletePost(post.id);
-            }}
-          >
-            delete post
-          </button>
+          <UpdDelBtns
+            contentId={post.id}
+            contentUrl={`http://localhost:3000/posts/${post.id}`}
+            setContent={setPosts}
+            getPostData={getAddPostContent}
+            sendRequestToDb={sendRequestToDb}
+          />
           <h4>id: {post?.id}</h4>
           <h4>title: {post?.title}</h4>
           {showPost && (
@@ -168,53 +129,7 @@ const Posts = ({ showPost, setShowPost }) => {
       {isLoading ? (
         <h2>Loading...</h2>
       ) : (
-        <nav id="todosFilterNav">
-          <h3>Filter by: </h3>
-          <button
-            type="button"
-            className="todosFilterBtn"
-            onClick={() => openFilterInput("id")}
-          >
-            id
-          </button>
-          <button
-            type="button"
-            className="todosFilterBtn"
-            onClick={() => openFilterInput("title")}
-          >
-            title
-          </button>
-          <button
-            type="button"
-            className="todosFilterBtn"
-            onClick={() => {
-              setSearchParams("");
-              setFilterOn("");
-            }}
-          >
-            reset filter
-          </button>
-
-          {filterOn.length > 0 && (
-            <>
-              <input
-                type="text"
-                value={filteredValue}
-                onChange={(e) => {
-                  setFilteredValue(e.target.value);
-                }}
-              />
-              <button
-                type="button"
-                onClick={() => {
-                  setSearchParams(`&${filterOn}=${filteredValue}`);
-                }}
-              >
-                Filter {filterOn}
-              </button>
-            </>
-          )}
-        </nav>
+        <FilterNav setSearchParams={setSearchParams} todos={false} />
       )}
       {error ? (
         <h2>Error! not found</h2>

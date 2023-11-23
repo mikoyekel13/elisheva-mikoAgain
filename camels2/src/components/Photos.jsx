@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import useFetch from "../assets/customHooks/useFetch";
 import { useParams } from "react-router-dom";
+import UpdDelBtns from "./UpdDelBtns";
 
 const Photos = () => {
   const [photos, setPhotos] = useState([]);
@@ -32,15 +33,6 @@ const Photos = () => {
     fetchPhotos();
   }, [albumId, fetchData]);
 
-  async function deletePhoto(currPhotoId) {
-    await fetchData(`http://localhost:3000/photos/${currPhotoId}`, {
-      method: "DELETE",
-    });
-    setPhotos((prevPhotos) => {
-      return prevPhotos.filter((photo) => photo.id !== currPhotoId);
-    });
-  }
-
   async function addPhoto() {
     const newPhotoObj = getAddPhotoContent();
     const responsePhoto = await sendRequestToDb(
@@ -50,24 +42,6 @@ const Photos = () => {
     );
 
     setPhotos((prevPhotos) => [...prevPhotos, responsePhoto]);
-  }
-
-  async function changePhoto(PhotoId) {
-    const newPhotoObj = getAddPhotoContent();
-    const responsePhoto = await sendRequestToDb(
-      "PUT",
-      `http://localhost:3000/photos/${PhotoId}`,
-      newPhotoObj
-    );
-
-    setPhotos((prevPhotos) => {
-      let newPhotos = [...prevPhotos];
-      const photoIndex = prevPhotos.findIndex(
-        (photo) => photo.id === responsePhoto.id
-      );
-      newPhotos[photoIndex] = responsePhoto;
-      return newPhotos;
-    });
   }
 
   async function sendRequestToDb(requestType, url, body) {
@@ -109,20 +83,13 @@ const Photos = () => {
       photosDisplay.push(
         <div>
           <img key={photos[i].id} src={photos[i].thumbnailUrl} />
-          <button
-            onClick={async () => {
-              await changePhoto(photos[i].id);
-            }}
-          >
-            update photo
-          </button>
-          <button
-            onClick={async () => {
-              await deletePhoto(photos[i].id);
-            }}
-          >
-            delete photo
-          </button>
+          <UpdDelBtns
+            contentId={photos[i].id}
+            contentUrl={`http://localhost:3000/photos/${photos[i].id}`}
+            setContent={setPhotos}
+            getPostData={getAddPhotoContent}
+            sendRequestToDb={sendRequestToDb}
+          />
         </div>
       );
     }
@@ -151,7 +118,7 @@ const Photos = () => {
         <div>
           <>
             <button onClick={addPhoto}>add photo</button>
-            <br/>
+            <br />
             <section>{photosOnPage}</section>
             <button
               onClick={() =>

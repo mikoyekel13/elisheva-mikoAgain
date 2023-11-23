@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import useFetch from "../assets/customHooks/useFetch";
 import { useParams, Outlet, useNavigate } from "react-router-dom";
+import FilterNav from "./FilterNav";
+import UpdDelBtns from "./UpdDelBtns";
 
 const Albums = ({ showAlbum, setShowAlbum }) => {
   const [albums, setAlbums] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
   const [serchParams, setSearchParams] = useState("");
-  const [filterOn, setFilterOn] = useState("");
-  const [filteredValue, setFilteredValue] = useState("");
 
   const fetchData = useFetch;
   const { id, albumId } = useParams();
@@ -39,15 +39,6 @@ const Albums = ({ showAlbum, setShowAlbum }) => {
     fetchAlbums();
   }, [showAlbum, serchParams, albumId, id, fetchData]);
 
-  async function deleteAlbum(currAlbumId) {
-    await fetchData(`http://localhost:3000/albums/${currAlbumId}`, {
-      method: "DELETE",
-    });
-    setAlbums((prevAlbums) => {
-      return prevAlbums.filter((album) => album.id !== currAlbumId);
-    });
-  }
-
   async function addAlbum() {
     const newAlbumObj = getAddAlbumContent();
     const responseAlbum = await sendRequestToDb(
@@ -57,24 +48,6 @@ const Albums = ({ showAlbum, setShowAlbum }) => {
     );
 
     setAlbums((prevAlbums) => [...prevAlbums, responseAlbum]);
-  }
-
-  async function changeAlbum(albumId) {
-    const newAlbumObj = getAddAlbumContent();
-    const responseAlbum = await sendRequestToDb(
-      "PUT",
-      `http://localhost:3000/albums/${albumId}`,
-      newAlbumObj
-    );
-
-    setAlbums((prevAlbums) => {
-      let newAlbums = [...prevAlbums];
-      const albumIndex = prevAlbums.findIndex(
-        (album) => album.id === responseAlbum.id
-      );
-      newAlbums[albumIndex] = responseAlbum;
-      return newAlbums;
-    });
   }
 
   async function sendRequestToDb(requestType, url, body) {
@@ -96,11 +69,6 @@ const Albums = ({ showAlbum, setShowAlbum }) => {
     return newAlbum;
   }
 
-  function openFilterInput(type) {
-    setFilteredValue("");
-    setFilterOn(type);
-  }
-
   const albumsDisplay = albums.map((album) => (
     <div key={album.id}>
       <button
@@ -119,20 +87,13 @@ const Albums = ({ showAlbum, setShowAlbum }) => {
       >
         back to albums
       </button>
-      <button
-        onClick={async () => {
-          await changeAlbum(album.id);
-        }}
-      >
-        update album
-      </button>
-      <button
-        onClick={async () => {
-          await deleteAlbum(album.id);
-        }}
-      >
-        delete album
-      </button>
+      <UpdDelBtns
+        contentId={album.id}
+        contentUrl={`http://localhost:3000/albums/${album.id}`}
+        setContent={setAlbums}
+        getPostData={getAddAlbumContent}
+        sendRequestToDb={sendRequestToDb}
+      />
       <h4>id: {album?.id}</h4>
       <h4>title: {album?.title}</h4>
       {showAlbum && (
@@ -163,53 +124,7 @@ const Albums = ({ showAlbum, setShowAlbum }) => {
       {isLoading ? (
         <h2>Loading...</h2>
       ) : (
-        <nav id="todosFilterNav">
-          <h3>Filter by: </h3>
-          <button
-            type="button"
-            className="todosFilterBtn"
-            onClick={() => openFilterInput("id")}
-          >
-            id
-          </button>
-          <button
-            type="button"
-            className="todosFilterBtn"
-            onClick={() => openFilterInput("title")}
-          >
-            title
-          </button>
-          <button
-            type="button"
-            className="todosFilterBtn"
-            onClick={() => {
-              setSearchParams("");
-              setFilterOn("");
-            }}
-          >
-            reset filter
-          </button>
-
-          {filterOn.length > 0 && (
-            <>
-              <input
-                type="text"
-                value={filteredValue}
-                onChange={(e) => {
-                  setFilteredValue(e.target.value);
-                }}
-              />
-              <button
-                type="button"
-                onClick={() => {
-                  setSearchParams(`&${filterOn}=${filteredValue}`);
-                }}
-              >
-                Filter {filterOn}
-              </button>
-            </>
-          )}
-        </nav>
+        <FilterNav setSearchParams={setSearchParams} todos={false} />
       )}
       {error ? (
         <h2>Error! not found</h2>
