@@ -32,14 +32,68 @@ const Todos = () => {
     fetchTodos();
   }, [fetchData, id, serchParams]);
 
-  async function updateTodosDb(e, id) {
-    const currValue = e.target.checked;
-    await fetchData(`http://localhost:3000/todos/${id}`, {
-      method: "PATCH",
+  async function deleteToDo(currtodoId) {
+    await fetchData(`http://localhost:3000/todos/${currtodoId}`, {
+      method: "DELETE",
+    });
+    setTodos((prevtodos) => {
+      return prevtodos.filter((todo) => todo.id !== currtodoId);
+    });
+  }
+
+  async function addToDo() {
+    const newToDoObj = getAddToDoContent();
+    const responseToDo = await sendRequestToDb(
+      "POST",
+      `http://localhost:3000/todos/`,
+      newToDoObj
+    );
+
+    setTodos((prevToDos) => [...prevToDos, responseToDo]);
+  }
+
+  async function changeToDo(todoId) {
+    const newtodoObj = getAddToDoContent();
+    const responseToDo = await sendRequestToDb(
+      "PUT",
+      `http://localhost:3000/todos/${todoId}`,
+      newtodoObj
+    );
+
+    setTodos((prevtodos) => {
+      let newToDos = [...prevtodos];
+      const toDoIndex = prevtodos.findIndex(
+        (todo) => todo.id === responseToDo.id
+      );
+      newToDos[toDoIndex] = responseToDo;
+      return newToDos;
+    });
+  }
+
+  async function sendRequestToDb(requestType, url, body) {
+    const response = await fetchData(url, {
+      method: requestType,
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ completed: currValue }),
+      body: JSON.stringify(body),
+    });
+    return response;
+  }
+
+  function getAddToDoContent() {
+    const ToDoTitle = prompt("please enter your todo title");
+    const newToDo = {
+      title: ToDoTitle,
+      userId: id,
+    };
+    return newToDo;
+  }
+
+  function updateTodosDb(e, id) {
+    const currValue = e.target.checked;
+    sendRequestToDb("PATCH", `http://localhost:3000/todos/${id}`, {
+      completed: currValue,
     });
   }
 
@@ -124,6 +178,21 @@ const Todos = () => {
 
   const todosDisplay = todos.map((todo) => (
     <div key={todo.id}>
+      <button
+        onClick={async () => {
+          await changeToDo(todo.id);
+        }}
+      >
+        update todo
+      </button>
+      <button
+        onClick={async () => {
+          await deleteToDo(todo.id);
+        }}
+      >
+        delete todo
+      </button>
+      <br />
       <input
         type="checkbox"
         defaultChecked={todo.completed}
@@ -136,6 +205,9 @@ const Todos = () => {
   return (
     <section>
       <h2>Your todos</h2>
+
+      <button onClick={addToDo}>add todo</button>
+
       <div>
         {isLoading ? (
           <h2>Loading...</h2>
